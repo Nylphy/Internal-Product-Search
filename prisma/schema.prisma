@@ -1,0 +1,46 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["public", "auth"]
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+model Produtos {
+  index     Int    @id @unique
+  Codigo    String
+  Descricao String
+  Unid      String
+  Preco     Float
+
+  @@schema("auth")
+}
+
+model User {
+  id            String @id @default(uuid())
+  username      String @unique
+  passwordHash  String
+  userAuthToken String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  role   Roles @relation(fields: [roleId], references: [id])
+  roleId Int
+
+  @@schema("auth")
+}
+
+model Roles {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+  User User[]
+
+  @@schema("auth")
+}
